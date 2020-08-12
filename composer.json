@@ -1,0 +1,44 @@
+{
+    "name": "prosperoking/paystack",
+    "description": "A Simple Wrapper for paystack transfer api",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Prosper Nweze",
+            "email": "daponextraspp@gmail.com",
+            "homepage": "https://github.com/prosperoking"
+        }
+    ],
+    "homepage": "https://github.com/prosperoking/paystack",
+    "keywords": ["Laravel", "Paystack"],
+    "require": {
+        "illuminate/support": "~5|~6|~7",
+        "guzzlehttp/guzzle": "^7.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^8.0",
+        "mockery/mockery": "^1.1",
+        "orchestra/testbench": "~3|~4",
+        "sempro/phpunit-pretty-print": "^1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "prosperoking\\Paystack\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "prosperoking\\Paystack\\Tests\\": "tests"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "prosperoking\\Paystack\\PaystackServiceProvider"
+            ],
+            "aliases": {
+                "PaystackTransfer": "prosperoking\\Paystack\\Facades\\Paystack"
+            }
+        }
+    }
+}
