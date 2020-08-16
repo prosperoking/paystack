@@ -14,7 +14,6 @@ class Paystack
 {
     private function http()
     {
-        Log::info(config('paystack-transfer.base_url'));
         return new PaystackHttpClient([
             'base_uri' => config('paystack-transfer.base_url'),
             'headers'=>[
@@ -79,7 +78,7 @@ class Paystack
     {
         try {
             $response = $this->http()->post('/transferrecipient',[
-                'data'=>[
+                'json'=>[
                     "type"=> $type,
                     "name"=> $name,
                     "account_number"=> $account_number,
@@ -99,7 +98,7 @@ class Paystack
     {
         try {
             $response = $this->http()->post('/transfer',[
-                'data'=>[
+                'json'=>[
                     "source"=> "balance",
                     "reason"=> $reason,
                     "amount"=>$amount,
