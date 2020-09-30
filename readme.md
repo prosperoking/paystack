@@ -17,6 +17,17 @@ $ composer require prosperoking/paystack
 
 ## Usage
 
+- Validate an Account Number
+ Now you can have a bank account validator *bankaccount* to enable you to validate an account number you will need to pass the bankcode field to it.
+```php
+
+Validator::validate($data,[
+    'bankcode'=>'required|string',
+    'account_no'=>'required|bankaccount,account.bankcode'
+])
+```
+
+
 ## Change log
 
 Please see the [changelog](changelog.md) for more information on what has changed recently.
