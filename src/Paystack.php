@@ -3,7 +3,7 @@
 namespace prosperoking\Paystack;
 
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Log;
+use prosperoking\Paystack\Models\Balance;
 use prosperoking\Paystack\Models\Bank;
 use prosperoking\Paystack\Models\BankAccountInfo;
 use prosperoking\Paystack\Models\Transfer;
@@ -12,15 +12,10 @@ use Throwable;
 
 class Paystack
 {
-    private function http()
+    private $http;
+    public function __construct(PaystackHttpClient $http)
     {
-        return new PaystackHttpClient([
-            'base_uri' => config('paystack-transfer.base_url'),
-            'headers'=>[
-                'accept'=>'application/json',
-                'Authorization'=> 'Bearer '.config('paystack-transfer.secret_key')
-            ]
-        ]);
+        $this->http = $http;
     }
 
     /**
@@ -33,7 +28,7 @@ class Paystack
     public function getAccountInfo($account_number, $bank_code)
     {
         try {
-            $response = $this->http()->get('/bank/resolve',[
+            $response = $this->http->get('/bank/resolve',[
                 'query'=>[
                     'account_number'=>$account_number,
                     'bank_code'=>$bank_code
@@ -46,11 +41,17 @@ class Paystack
            throw $th;
         }
     }
-
+    /**
+     * 
+     * @param int $per_page 
+     * @param int $page 
+     * @return Collection<Banks>|void 
+     * @throws Throwable 
+     */
     public function getBanks($per_page=50,$page=1)
     {
         try {
-            $response = $this->http()->get('/bank',['query'=>[
+            $response = $this->http->get('/bank',['query'=>[
                 'perPage'=>$per_page,
                 'page'=>$page
             ]]);
@@ -72,12 +73,12 @@ class Paystack
      * @param string $account_number Bank Account Number
      * @param string $bank_code Bank Code
      * @param float $amount amount to send as kobo
-     * @return void
+     * @return TransferReciept
      */
     public function createTransferReciept($account_number,$bank_code,$name="",$type="nuban",$currency='NGN')
     {
         try {
-            $response = $this->http()->post('/transferrecipient',[
+            $response = $this->http->post('/transferrecipient',[
                 'json'=>[
                     "type"=> $type,
                     "name"=> $name,
@@ -93,11 +94,18 @@ class Paystack
             throw $th;
         }
     }
-
-    public function transfer($recipient_code, $amount, $reason)
+    /**
+     * 
+     * @param mixed $recipient_code 
+     * @param mixed $amount 
+     * @param mixed $reason 
+     * @return Transfer 
+     * @throws Throwable 
+     */
+    public function transfer($recipient_code, $amount, $reason):Transfer
     {
         try {
-            $response = $this->http()->post('/transfer',[
+            $response = $this->http->post('/transfer',[
                 'json'=>[
                     "source"=> "balance",
                     "reason"=> $reason,
@@ -111,12 +119,16 @@ class Paystack
             throw $th;
         }
     }
-
+    /**
+     * 
+     * @return Balance 
+     * @throws Throwable 
+     */
     public function balance()
     {
         try {
-            $response = $this->http()->get('/balance');
-            return $response['status']? (object) ($response['data']): null;
+            $response = $this->http->get('/balance');
+            return $response['status']? new Balance($response['data'][0]): null;
         } catch (\Throwable $th) {
             throw $th;
         }

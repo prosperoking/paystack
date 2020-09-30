@@ -3,6 +3,8 @@
 namespace prosperoking\Paystack;
 
 use Illuminate\Support\ServiceProvider;
+use prosperoking\Paystack\Rules\AccountInfoValidator;
+use Validator;
 
 class PaystackServiceProvider extends ServiceProvider
 {
@@ -22,6 +24,8 @@ class PaystackServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->bootForConsole();
         }
+
+        Validator::extend('bankaccount',AccountInfoValidator::class.'@validate');
     }
 
     /**
@@ -35,8 +39,13 @@ class PaystackServiceProvider extends ServiceProvider
 
         // Register the service the package provides.
         $this->app->singleton(Paystack::class, function ($app) {
-            return new Paystack;
+            return new Paystack(new PaystackHttpClient);
         });
+
+        $this->app->singleton(PaystackHttpClient::class,function($app) {
+            return new PaystackHttpClient;
+        });
+
     }
 
     /**

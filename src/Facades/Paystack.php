@@ -3,6 +3,7 @@
 namespace prosperoking\Paystack\Facades;
 
 use Illuminate\Support\Facades\Facade;
+use prosperoking\Paystack\Paystack as PaystackPaystack;
 
 class Paystack extends Facade
 {
@@ -13,6 +14,6 @@ class Paystack extends Facade
      */
     protected static function getFacadeAccessor()
     {
-        return 'paystack';
+        return PaystackPaystack::class;
     }
 }

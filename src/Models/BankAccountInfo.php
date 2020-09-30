@@ -8,7 +8,7 @@ class BankAccountInfo {
     public function __construct(array $data)
     {
         $this->account_number = $data['account_number'];
-        $this->account_name = $data['account_number'];
+        $this->account_name = $data['account_name'];
         $this->bank_id = $data['bank_id'];
     }
 }
