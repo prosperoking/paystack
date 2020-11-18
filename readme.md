@@ -15,18 +15,68 @@ Via Composer
 $ composer require prosperoking/paystack
 ```
 
+After installing run vendor publish and select PaystackTransfer from the prompt
+```bash
+$ php artisan vendor:publish
+```
+
 ## Usage
 
-- Validate an Account Number
+- Validate an Account Number: 
  Now you can have a bank account validator *bankaccount* to enable you to validate an account number you will need to pass the bankcode field to it.
 ```php
 
 Validator::validate($data,[
     'bankcode'=>'required|string',
-    'account_no'=>'required|bankaccount,account.bankcode'
+    'account_no'=>'required|bankaccount,bankcode'
 ])
 ```
 
+- Get Banks
+
+```php
+
+    Paystack::getBanks(); // returns  a laravel collection
+
+```
+
+- Create a transfer Recipient
+```php
+
+    \PaystackTransfer::createTransferReciept($account_no,$bank_code, $account_name);
+
+```
+
+- Make a transfer
+
+```php
+    \PaystackTransfer::transfer($recipient_code, $amount, $reason);
+
+```
+- Get transfer 
+```php
+    \PaystackTransfer::fetchTransfer(string $id_or_code);
+
+```
+
+- Get Transfer Balance
+
+```php
+    \PaystackTransfer::balance()
+```
+
+- Make Bulk Transfer
+
+```php
+
+    $payload = $transfers->map(fn(Transfer $transfer)=>[
+                    'reference'=>$transfer->id,
+                    'recipient'=>$transfer->recipient,
+                    'amount'=> (int) round($transfer->amount * 100)
+                ])->toArray();
+    \PaystackTransfer::bulkTransfer($payload);
+
+```
 
 ## Change log
 

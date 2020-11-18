@@ -6,6 +6,7 @@ use Illuminate\Support\Collection;
 use prosperoking\Paystack\Models\Balance;
 use prosperoking\Paystack\Models\Bank;
 use prosperoking\Paystack\Models\BankAccountInfo;
+use prosperoking\Paystack\Models\BulkTransferItem;
 use prosperoking\Paystack\Models\Transfer;
 use prosperoking\Paystack\Models\TransferReciept;
 use Throwable;
@@ -42,11 +43,11 @@ class Paystack
         }
     }
     /**
-     * 
-     * @param int $per_page 
-     * @param int $page 
-     * @return Collection<Banks>|void 
-     * @throws Throwable 
+     *
+     * @param int $per_page
+     * @param int $page
+     * @return Collection<Banks>|void
+     * @throws Throwable
      */
     public function getBanks($per_page=50,$page=1)
     {
@@ -95,12 +96,12 @@ class Paystack
         }
     }
     /**
-     * 
-     * @param mixed $recipient_code 
-     * @param mixed $amount 
-     * @param mixed $reason 
-     * @return Transfer 
-     * @throws Throwable 
+     *
+     * @param mixed $recipient_code
+     * @param mixed $amount
+     * @param mixed $reason
+     * @return Transfer
+     * @throws Throwable
      */
     public function transfer($recipient_code, $amount, $reason):Transfer
     {
@@ -119,10 +120,81 @@ class Paystack
             throw $th;
         }
     }
+
     /**
-     * 
-     * @return Balance 
-     * @throws Throwable 
+     * @param array $transfers
+     * @return Collection<BulkTransferItem>
+     * @throws Throwable
+     */
+    public function bulkTransfer(array $transfers): Collection
+    {
+        try {
+            $response = $this->http->post('/transfer/bulk',[
+                'json'=>[
+                    "source"=> "balance",
+                    "transfers" => $transfers
+                ]
+            ]);
+            return $response['status']? collect($response['data'])->mapInto(BulkTransferItem::class): null;
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+
+    /**
+     *
+     * @return mixed
+     * @throws Throwable
+     */
+    public function disableOtp()
+    {
+        try {
+            $response = $this->http->post('/transfer/disable_otp');
+            return $response['status']? $response['data']: null;
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+
+    /**
+     *
+     * @param string $otp
+     * @return mixed
+     * @throws Throwable
+     */
+    public function finalizeDisableOtp(string $otp)
+    {
+        try {
+            $response = $this->http->post('/transfer/disable_otp',[
+                'json'=>[
+                    'otp'=> $otp
+                ]
+            ]);
+            return $response['status']? $response['data']: null;
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+
+    /**
+     *
+     * @param string $id_or_code
+     * @return Transfer
+     * @throws Throwable
+     */
+    public function fetchTransfer(string $id_or_code): Transfer
+    {
+        try {
+            $response = $this->http->get("/transfer/{$id_or_code}");
+            return $response['status']? new Transfer($response['data']): null;
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+    }
+    /**
+     *
+     * @return Balance
+     * @throws Throwable
      */
     public function balance()
     {
